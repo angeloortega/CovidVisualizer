@@ -1,0 +1,17 @@
+<igx-geographic-map #map
+    width="700px"
+    height="400px"
+    zoomable="true" >
+</igx-geographic-map>
+
+<ng-template let-series="series" let-item="item" #template>
+    <div>
+        <span>
+            State: {{item.name}}
+        </span>
+    <br/>
+        <span>
+            Population: {{item.population}} K
+        </span>
+    </div>
+</ng-template>
