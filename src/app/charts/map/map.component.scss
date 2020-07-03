@@ -1,38 +1,45 @@
-.my-legend  .legend-title{
-    display: inline-block;
-    margin-left: 15%;
-    margin-bottom: 8px;
-    font-weight: bold;
-    font-size: 90%;
-    }
-  .my-legend .legend-scale ul {
-    margin-left: 10%;    
-    float: left;
-    list-style: none;
-    }
-  .my-legend .legend-scale ul li {
-    display: block;
-    float: left;
-    width: 50px;
-    margin-bottom: 6px;
-    margin-right: 100px;
-    text-align: center;
-    font-size: 85%;
-    list-style: none;
-    }
-  .my-legend ul.legend-labels li span {
-    display: block;
-    float: left;
-    height: 15px;
-    width: 50px;
-    padding: 20px;
-    font-weight: bold;
-    }
-  .my-legend .legend-source {
-    font-size: 70%;
-    color: #999;
-    clear: both;
-    }
-  .my-legend a {
-    color: #777;
-    }
+// * {
+//   font-family: sans-serif;
+// }
+// #wrapper {
+//   height: 500px;
+//   width: 1000px;
+//   margin: 0 auto;
+//   padding: 0;
+//   overflow:visible;
+// }
+// #container {
+//   float: left;
+//   height: 500px; 
+//   width: 700px; 
+//   margin: 0;
+// }
+// #info {
+//   float: left;
+//   width: 270px;
+//   padding-left: 20px;
+//   margin: 100px 0 0 0;
+//   border-left: 1px solid silver;
+// }
+// #info h2 {
+//   display: inline;
+//   font-size: 13pt;
+// }
+// #info .f32 .flag {
+//   vertical-align: bottom !important;
+// }
+
+// #info h4 {
+//   margin: 1em 0 0 0;
+// }
+
+// @media screen and (max-width: 920px) {
+//   #wrapper, #container,  #info {
+//     float: none;
+//     width: 100%;
+//     height: auto;
+//     margin: 0.5em 0;
+//     padding: 0;
+//     border: none;
+//   }
+// }

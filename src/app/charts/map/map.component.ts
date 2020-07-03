@@ -1,79 +1,65 @@
-import { AfterViewInit, Component, TemplateRef, ViewChild } from "@angular/core";
-import { IgxGeographicHighDensityScatterSeriesComponent
-} from "igniteui-angular-maps";
-import { IgxGeographicMapComponent } from "igniteui-angular-maps";
+declare var require: any;
 
+import { Component, OnInit } from '@angular/core';
+import * as Highcharts from 'highcharts';
+import MapModule from 'highcharts/modules/map';
+
+const World = require('@highcharts/map-collection/custom/world-continents.geo.json');
+const continentCodes = require('./country-and-continent-codes-list.json');
+MapModule(Highcharts);
 @Component({
-  selector: 'app-map',
-  templateUrl: './map.component.html',
-  styleUrls: ['./map.component.scss']
+    selector: 'app-map',
+    templateUrl: './map.component.html',
+    styleUrls: ['./map.component.scss']
 })
-export class MapComponent {
+export class MapComponent implements OnInit{
+    apiEndpoint = "https://api.thevirustracker.com/free-api?countryTotals=ALL"
+    title = "app";
+    chart;
+    updateFromInput = false;
+    Highcharts = Highcharts;
+    chartConstructor = "mapChart";
+    chartCallback;
+    chartOptions = {
+        chart: {
+            map: World
+        },
+        title: {
+            text: 'Highmaps basic demo'
+        },
+        mapNavigation: {
+            enabled: true,
+            buttonOptions: {
+                alignTo: 'spacingBox'
+            }
+        },
+        colorAxis: {
+            min: 0
+        },
+        series: [{
+            name: 'Random data',
+            states: {
+                hover: {
+                    color: '#BADA55'
+                }
+            },
+            dataLabels: {
+                enabled: true,
+                format: '{point.name}'
+            },
+            allAreas: false,
+            data: [
+                ['eu', 0],
+                ['oc', 1],
+                ['af', 2],
+                ['as', 3],
+                ['na', 4],
+                ['sa', 5]
+            ]
+        }]
+    }
 
-  @ViewChild("map", {static: true})
-  public map: IgxGeographicMapComponent;
-  @ViewChild("template", {static: true})
-  public tooltip: TemplateRef<object>;
-  constructor() {
-  }
-
-  public ngAfterViewInit(): void {
-      this.componentDidMount();
-  }
-
-  public componentDidMount() {
-      // fetching JSON data with geographic locations from public folder
-      fetch("https://static.infragistics.com/xplatform/data/UsaCitiesPopulation.csv")
-          .then((response) => response.text())
-          .then((data) => this.onDataLoaded(data));
-  }
-
-  public onDataLoaded(csvData: string) {
-      const csvLines = csvData.split("\n");
-      console.log("loaded https://www.infragistics.com/angular-demos-dv/assets/Data/UsaCities.csv " + csvLines.length);
-
-      // parsing CSV data and creating geographic locations
-      const geoLocations: any[] = [];
-      for (let i = 1; i < csvLines.length; i++) {
-          const columns = csvLines[i].split(",");
-          const location = {
-              code: columns[4],
-              county: columns[5],
-              density: Number(columns[6]),
-              latitude:  Number(columns[1]),
-              longitude: Number(columns[2]),
-              name:  columns[0],
-              population: Number(columns[3]),
-              state: columns[3]
-          };
-          geoLocations.push(location);
-      }
-      console.log("csvLines " + csvLines.length);
-
-      // creating HD series with loaded data
-      const geoSeries = new IgxGeographicHighDensityScatterSeriesComponent();
-      geoSeries.dataSource = geoLocations;
-      geoSeries.latitudeMemberPath  = "latitude";
-      geoSeries.longitudeMemberPath = "longitude";
-      geoSeries.heatMaximumColor = "Red";
-      geoSeries.heatMinimumColor = "Black";
-      geoSeries.heatMinimum = 0;
-      geoSeries.heatMaximum = 5;
-      geoSeries.pointExtent = 1;
-      geoSeries.tooltipTemplate = this.tooltip;
-      geoSeries.mouseOverEnabled = true;
-
-      // adding symbol series to the geographic amp
-      this.map.series.add(geoSeries);
-
-      // zooming to bound of lower 48-states
-      const geoBounds = {
-          height: Math.abs(50 - 15),
-          left: -130,
-          top: 15,
-          width: Math.abs(-130 + 65)
-      };
-      this.map.zoomToGeographic(geoBounds);
-  }
+    ngOnInit(){
+        
+    }
 }
-

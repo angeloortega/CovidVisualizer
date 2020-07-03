@@ -9,6 +9,8 @@ import { TreeMapComponent } from './charts/tree-map/tree-map.component';
 import { MapComponent } from './charts/map/map.component';
 import { IgxGeographicMapModule } from 'igniteui-angular-maps';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientModule } from '@angular/common/http';
+import { HighchartsChartModule } from "highcharts-angular";
 
 @NgModule({
   declarations: [
@@ -22,7 +24,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     IgxDataChartInteractivityModule,
     BrowserAnimationsModule,
     BrowserModule,
-    AppRoutingModule
+    HighchartsChartModule,
+    AppRoutingModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]
