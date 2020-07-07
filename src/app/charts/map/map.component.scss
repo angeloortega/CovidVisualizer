@@ -1,0 +1,19 @@
+.boxChart{
+    &__container{
+        width: 95%;
+        height: 45vh;
+        margin: auto;
+        padding: 10px;
+    }
+    &__continent-details{
+        width: 45vw;
+        height: 100%;
+        //display: block;
+    }
+    &__map{
+        width: 45vw;
+        height: 100%;
+        float: left;
+        //display: block;
+    }
+}

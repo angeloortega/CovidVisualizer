@@ -1,7 +1,7 @@
 declare var require: any;
 
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import * as Highcharts from 'highcharts';
+import * as Highcharts from 'highcharts/highstock';
 import MapModule from 'highcharts/modules/map';
 import { ChartDataService } from 'src/app/shared/chart-data.service';
 
@@ -16,24 +16,30 @@ export class MapComponent implements OnInit {
     Highcharts = Highcharts;
     chartConstructor = "mapChart";
     infoChartConstructor = "chart";
+    countryChartConstructor = "chart";
     mapChart;
     continentDetailsChart;
+    countryDetailsChart;
     mapChartCallback;
     continentDetailsCallback;
+    countryDetailsCallback;
     updateFromInput = false;
     updateContinentDetails = false;
+    updateCountryDetails = false;
     data: any = {};
     continentData = [];
     selectedContinents = [];
     selectedContinentsCountries = []
-    selectedContinentsData = []
+    selectedContinentsData = [];
+    selectedCountry = "";
+    selectedCountryData = [];
     date = new Date();
     mapChartOptions = {
         chart: {
             map: World
         },
         title: {
-            text: 'Total COVID-19 Cases as of ' + this.date.toLocaleDateString()
+            text: 'Total COVID-19 Cases as of ' + this.date.toLocaleDateString() + " by Continent"
         },
         subtitle: {
             text: 'Source: <a href="https://thevirustracker.com/api">The Virus Tracker</a>'
@@ -82,24 +88,19 @@ export class MapComponent implements OnInit {
     }
 
     continentDetailsOptions = {
-        chart: {
-            type: 'bar'
-        },
         title: {
-            text: 'Continent breakdown by country'
+            text: 'Continent COVID-19 Cases Breakdown by Country'
         },
-        // legend: {
-        //     layout: 'vertical',
-        //     align: 'left',
-        //     verticalAlign: 'top',
-        //     x: 250,
-        //     y: 100,
-        //     floating: true,
-        //     borderWidth: 1
-        // },
         xAxis: {
-            categories: this.selectedContinentsCountries, title: {
+            categories: this.selectedContinentsCountries,
+            title: {
                 text: null
+            },
+            type: 'category',
+            min: 0,
+            max: 5,
+            scrollbar: {
+                enabled: true
             }
         },
         yAxis: {
@@ -114,18 +115,73 @@ export class MapComponent implements OnInit {
             bar: {
                 dataLabels: {
                     enabled: true
+                },
+                allowPointSelect: true,
+                point: {
+                    events: {
+                        select: () => { //Arrow function required to bind to chart component instead of the sub-object
+                            this.selectCountry();
+                        },
+                        unselect: () => {
+                            this.selectCountry();
+                        }
+                    }
+                },
+                states: {
+                    inactive: {
+                        enabled: false
+                    },
+                    hover: {
+                        color: '#ddd'
+                    }
                 }
             }
         },
         credits: {
             enabled: false
         },
+
         series: this.selectedContinentsData
+    }
+
+    countryDetailsOptions = {
+        title: {
+            text: 'Country COVID-19 Cases Breakdown by Date'
+        },
+        subtitle: {
+            text: this.selectedCountry
+        },
+        xAxis: {
+            type: 'datetime',
+            title: {
+                text: 'Date'
+            }
+        },
+        yAxis: {
+            type: 'logarithmic',
+            title: {
+                text: 'Cases'
+            },
+            min: 1
+        },
+        tooltip: {
+            headerFormat: '<b>{series.name}</b><br>',
+            pointFormat: '{point.x:%e. %b}: {point.y:.0f}'
+        },
+
+        plotOptions: {
+            series: {
+                marker: {
+                    enabled: true
+                }
+            }
+        },
+        series: this.selectedCountryData
     }
 
     constructor(private chartDataService: ChartDataService,
         private cdRef: ChangeDetectorRef
-        ) {
+    ) {
         const self = this;
         this.mapChartCallback = chart => {
             self.mapChart = chart;
@@ -135,6 +191,10 @@ export class MapComponent implements OnInit {
             self.continentDetailsChart = chart;
             this.updateSelectedContinents();
         };
+        this.countryDetailsCallback = chart => {
+            self.countryDetailsChart = chart;
+            this.updateSelectedCountry();
+        };
     }
 
     ngOnInit() {
@@ -142,14 +202,26 @@ export class MapComponent implements OnInit {
 
     ngAfterViewChecked() {
         this.cdRef.detectChanges();
-      }
+    }
 
     selectContinent() {
         this.selectedContinents = this.mapChart.getSelectedPoints().map(function (e) {
             return e['hc-key'];
         });
-        if(typeof this.continentDetailsChart !== "undefined"){
+        if (typeof this.continentDetailsChart !== "undefined") {
             this.updateSelectedContinents();
+            this.selectedCountry = "";
+            //this.updateSelectedCountry();
+        }
+    }
+    selectCountry() {
+        let countries = this.continentDetailsChart.getSelectedPoints();
+
+        if (countries.length > 0) {
+            this.selectedCountry = countries[0].category;
+            this.updateSelectedCountry();
+        } else {
+            this.selectedCountry = "";
         }
     }
     async updateContinentInformation() {
@@ -163,38 +235,55 @@ export class MapComponent implements OnInit {
         };
         this.mapChart.hideLoading();
         this.updateFromInput = true;
-        console.log(this.data);
     }
 
     updateSelectedContinents() {
-        this.continentDetailsChart.showLoading();
-        let continentData =  this.getTopCountriesByContinents();
-        this.selectedContinentsCountries.splice(0, this.selectedContinentsCountries.length);
-        this.selectedContinentsData.splice(0, this.selectedContinentsData.length);
-        this.selectedContinentsData.push(...continentData.data);
-        this.selectedContinentsCountries.push(...continentData.names);
-        this.continentDetailsChart.hideLoading();
-        this.updateContinentDetails = true;
+        if (this.continentDetailsChart) {
+            this.continentDetailsChart.showLoading();
+            let continentData = this.getCountriesByContinent();
+            this.selectedContinentsCountries.splice(0, this.selectedContinentsCountries.length);
+            this.selectedContinentsData.splice(0, this.selectedContinentsData.length);
+            this.selectedContinentsData.push(...continentData.data);
+            this.selectedContinentsCountries.push(...continentData.names);
+            this.continentDetailsChart.hideLoading();
+            this.updateContinentDetails = true;
+        }
     }
 
+    async updateSelectedCountry() {
+        if (this.countryDetailsChart) {
+            this.countryDetailsChart.showLoading();
+            let countryData: any = await this.chartDataService.getCountryData(this.selectedCountry);
+            this.selectedCountryData.splice(0, this.selectedCountryData.length);
+            this.selectedCountryData.push(...countryData);
+            this.countryDetailsChart.hideLoading();
+            this.updateCountryDetails = true;
+        }
+    }
 
     //HELPER FUNCTIONS
-    getTopCountriesByContinents() {
-        let returnData = {names: [], data:[]};
+    getCountriesByContinent() {
+        let returnData = { names: [], data: [] };
 
-        if(this.selectedContinents.length > 0){
-        returnData.data = [{name: "Total Cases", data:[]},{name: "Total Recovered", data:[]},{name: "Total Active Cases", data:[]},{name: "Total Deaths", data:[]}]
-        let countryData = this.data.countriesByContinent[this.selectedContinents[0]];
-        countryData.sort((a, b) => (a.totalCases < b.totalCases) ? 1 : -1)
-        countryData.splice(6,countryData.length);
-        countryData.forEach(element => {
-            returnData.names.push(element.title);
-            returnData.data[0].data.push(element.totalCases)
-            returnData.data[1].data.push(element.totalRecovered)
-            returnData.data[2].data.push(element.totalActive)
-            returnData.data[3].data.push(element.totalDeaths)
+        if (this.selectedContinents.length > 0) {
+            returnData.data = [
+                {
+                    color: "#d2222d", name: "Total Cases", data: [], type: 'bar'
+                },
+                { color: "#2eb42e", name: "Total Recovered", data: [], type: 'bar' },
+                { color: "#ffbf00", name: "Total Active Cases", data: [], type: 'bar' },
+                { color: "#0d0d0d", name: "Total Deaths", data: [], type: 'bar' }]
+            let countryData = this.data.countriesByContinent[this.selectedContinents[0]];
+            countryData.sort((a, b) => (a.totalCases < b.totalCases) ? 1 : -1)
+            // countryData.splice(6,countryData.length);
+            countryData.forEach(element => {
+                returnData.names.push(element.title);
+                returnData.data[0].data.push(element.totalCases)
+                returnData.data[1].data.push(element.totalRecovered)
+                returnData.data[2].data.push(element.totalActive)
+                returnData.data[3].data.push(element.totalDeaths)
 
-        });
+            });
         }
 
         return returnData;
