@@ -1,19 +1,40 @@
-.boxChart{
-    &__container{
+.boxChart {
+    &__container {
         width: 95%;
-        height: 45vh;
+        // height: 90vh;
         margin: auto;
         padding: 10px;
     }
-    &__continent-details{
-        width: 45vw;
-        height: 100%;
-        //display: block;
+    &__continent-details {
+        width: 90vw;
+        height: 50%;
+        display: block;
     }
-    &__map{
-        width: 45vw;
-        height: 100%;
-        float: left;
-        //display: block;
+    &__map {
+        width: 90vw;
+        height: 50%;
+        display: block;
+    }
+}
+@media only screen and (min-width: 1024px) {
+    .boxChart {
+        &__container {
+            width: 95%;
+            height: 45vh;
+            margin: auto;
+            padding: 10px;
+        }
+        &__continent-details {
+            width: 45vw;
+            height: 100%;
+            display: block;
+        }
+        &__map {
+            width: 45vw;
+            height: 100%;
+            display: block;
+
+            float: left;
+        }
     }
 }

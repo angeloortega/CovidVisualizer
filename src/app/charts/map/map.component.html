@@ -9,7 +9,7 @@
 		<ng-container *ngIf="selectedContinents.length > 0">
 			<highcharts-chart id="info" [Highcharts]="Highcharts" [constructorType]="infoChartConstructor"
 				[options]="continentDetailsOptions" [callbackFunction]="continentDetailsCallback"
-				[(update)]=updateContinentDetails [oneToOne]="true" class="boxChart__continent-details" style="width: 45vw; height: 100%; display: block; margin: auto;">
+				[(update)]=updateContinentDetails [oneToOne]="true" class="boxChart__continent-details" style="height: 100%; display: block; margin: auto;">
 			</highcharts-chart>
 		</ng-container>
 		<ng-container *ngIf="selectedContinents.length === 0">
