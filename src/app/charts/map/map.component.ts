@@ -4,6 +4,8 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import * as Highcharts from 'highcharts/highstock';
 import MapModule from 'highcharts/modules/map';
 import { ChartDataService } from 'src/app/shared/chart-data.service';
+import { MatDialog } from '@angular/material';
+import { AlertDialogComponent } from 'src/app/shared/alert-dialog/alert-dialog.component';
 
 const World = require('@highcharts/map-collection/custom/world-continents.geo.json');
 MapModule(Highcharts);
@@ -173,14 +175,28 @@ export class MapComponent implements OnInit {
             series: {
                 marker: {
                     enabled: true
+                },
+                allowPointSelect: true,
+                point: {
+                    events: {
+                        select: () => { //Arrow function required to bind to chart component instead of the sub-object
+                            this.selectCountryDate();
+                        },
+                        unselect: () => {
+                            this.selectCountryDate();
+                        }
+                    }
                 }
             }
         },
         series: this.selectedCountryData
     }
 
+    currentCountryData: any;
+
     constructor(private chartDataService: ChartDataService,
-        private cdRef: ChangeDetectorRef
+        private cdRef: ChangeDetectorRef,
+        private dialog: MatDialog
     ) {
         const self = this;
         this.mapChartCallback = chart => {
@@ -214,6 +230,7 @@ export class MapComponent implements OnInit {
             //this.updateSelectedCountry();
         }
     }
+
     selectCountry() {
         let countries = this.continentDetailsChart.getSelectedPoints();
 
@@ -224,6 +241,14 @@ export class MapComponent implements OnInit {
             this.selectedCountry = "";
         }
     }
+
+    selectCountryDate() {
+        let date = this.countryDetailsChart.getSelectedPoints();
+        if(date.length === 1){
+            this.dialog.open(AlertDialogComponent,{data:{selected:date[0].pointData, country:this.selectedCountry, button2:'Cerrar'}})
+        }
+    }
+
     async updateContinentInformation() {
         this.mapChart.showLoading();
         this.data = await this.chartDataService.getChartData();
@@ -253,7 +278,8 @@ export class MapComponent implements OnInit {
     async updateSelectedCountry() {
         if (this.countryDetailsChart) {
             this.countryDetailsChart.showLoading();
-            let countryData: any = await this.chartDataService.getCountryData(this.selectedCountry);
+            this.currentCountryData = await this.chartDataService.getCountryData(this.selectedCountry);
+            let countryData: any = this.currentCountryData.dateData;
             this.selectedCountryData.splice(0, this.selectedCountryData.length);
             this.selectedCountryData.push(...countryData);
             this.countryDetailsChart.hideLoading();

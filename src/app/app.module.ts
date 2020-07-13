@@ -3,30 +3,31 @@ import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { IgxTreemapModule, IgxDataChartInteractivityModule } from "igniteui-angular-charts";
-import { IgxTreemapComponent } from 'igniteui-angular-charts';
 import { MapComponent } from './charts/map/map.component';
-import { IgxGeographicMapModule } from 'igniteui-angular-maps';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import { HighchartsChartModule } from "highcharts-angular";
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material';
+import { AlertDialogComponent } from './shared/alert-dialog/alert-dialog.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    MapComponent    
+    MapComponent,
+    AlertDialogComponent
   ],
   imports: [
-    IgxTreemapModule,
-    IgxGeographicMapModule,
-    IgxDataChartInteractivityModule,
     BrowserAnimationsModule,
     BrowserModule,
     HighchartsChartModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    MatDialogModule,
+    MatButtonModule
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [AlertDialogComponent]
 })
 export class AppModule { }

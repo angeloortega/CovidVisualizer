@@ -1,0 +1,12 @@
+<p mat-dialog-title>{{data.country + ' - ' + data.selected.stringDate }}</p>
+<mat-dialog-content>
+    <div class="text-center">
+        <h2 class=" mb-24" style="font-family: Arial, Helvetica, sans-serif;">{{'Casos nuevos del día: '}}<span style="font-family: Arial, Helvetica, sans-serif; color:darkred;">{{data.selected.new_daily_cases}}</span></h2>
+        <h2 class=" mb-24" style="font-family: Arial, Helvetica, sans-serif;">{{'Muertes nuevas del día: '}}<span style="font-family: Arial, Helvetica, sans-serif; color:black;">{{data.selected.new_daily_deaths}}</span></h2>
+        <h2 class=" mb-24" style="font-family: Arial, Helvetica, sans-serif;">{{'Recuperados nuevos del día: '}}<span style="font-family: Arial, Helvetica, sans-serif; color:darkgreen;">{{data.selected.new_daily_recoveries}}</span></h2>
+        <h2 class=" mb-24" style="font-family: Arial, Helvetica, sans-serif;">{{'Diferencia de casos diarios con respecto al dia anterior: '}}<span style="font-family: Arial, Helvetica, sans-serif;" [ngStyle]="{'color': (data.selected.previous_day_difference>0) ? 'darkred' : 'darkgreen'}">{{data.selected.previous_day_difference}}</span></h2>
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button mat-raised-button color="warn" mat-dialog-close="false">{{ data.button2 }}</button>
+</mat-dialog-actions>
